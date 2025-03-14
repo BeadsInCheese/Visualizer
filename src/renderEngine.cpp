@@ -20,6 +20,7 @@ renderEngine::renderEngine(){
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     window = glfwCreateWindow(800, 600, "Visualizer", nullptr, nullptr);
+    aspectRatio=(float)600/(float)800;
     initWindow();
 }
 void renderEngine::updateAspectRatio(){}
@@ -137,7 +138,9 @@ for(std::shared_ptr<Model> &m : models){
         for(auto i : uniforms){
                 m->setUniform(i.first,i.second);
         }
-
+        for(auto &i : m->material.buffers){
+            GL_CHECK(glBindBuffer(GL_SHADER_STORAGE_BUFFER, i.second));
+        }
         glDrawElements(GL_TRIANGLES, m->indexCount, GL_UNSIGNED_INT, 0);
 
 }

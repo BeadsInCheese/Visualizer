@@ -40,7 +40,7 @@ Model::Model(unsigned int shader,std::vector<float>& vertices,std::vector<int>& 
     GL_CHECK(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float))));
     GL_CHECK(glEnableVertexAttribArray(1));
     glUseProgram(shader);
-    shaderProgram=shader;
+    material.shaderProgram=shader;
     // Unbind the VAO
     GL_CHECK(glBindVertexArray(0));
 
@@ -53,11 +53,11 @@ Model::~Model(){
 }
 
 void Model::setShader(unsigned int program){
-    shaderProgram=program;
+    material.shaderProgram=program;
 }
 void Model::Bind(){
     GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, VBO));
-    GL_CHECK(glUseProgram(shaderProgram));
+    GL_CHECK(glUseProgram(material.shaderProgram));
     GL_CHECK(glBindVertexArray(VAO));
 
     GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
@@ -66,6 +66,6 @@ void Model::Bind(){
 
 void Model::setUniform(std::string name,float value){
 
-    int loc = glGetUniformLocation(shaderProgram, name.c_str());
+    int loc = glGetUniformLocation(material.shaderProgram, name.c_str());
     GL_CHECK(glUniform1f(loc,value));
 }

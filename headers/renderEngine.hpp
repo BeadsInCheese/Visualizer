@@ -17,7 +17,7 @@ class renderEngine{
 private:
     int width=600;
     int height=800;
-    std::vector<std::shared_ptr<Model>> models;
+
     std::unordered_map<std::string,float> uniforms;
 public:
     GLFWwindow* window;
@@ -28,6 +28,7 @@ public:
         void initWindow();
         
     public:
+        std::vector<std::shared_ptr<Model>> models;
         void addModel(std::shared_ptr<Model> &m);
         const char* ReadFileAsCString(std::string filename,std::string& result);
         void compileAndLinkShaderProgram(unsigned int &shaderProgram,const char* fragmentCode, const char* vertexCode);

@@ -8,7 +8,7 @@
 #include <complex>
 #include "sndfile.h"
 #include "renderEngine.hpp"
-
+#include "audioEngine.hpp"
 void testSndFile(){
     const char* filename = "example.wav";
     SF_INFO sfinfo;
@@ -67,8 +67,9 @@ int main() {
 
     auto m=std::make_shared<Model>(shaderProgram,v,ind);
     renderer.addModel(m);
-
-
+    std::vector<float> audio{0.9,0.8,0.8,0.7,0.6,0.5,0.4,0.8,0.8,0.7,0.6,0.5,0.4,0.8,0.8,0.7,0.6,0.5,0.4,0.9};
+    AudioEngine audioEngine;
+    audioEngine.loadFile();
         // Main loop
     while (!glfwWindowShouldClose(renderer.window)) {
 /*
@@ -80,6 +81,7 @@ int main() {
         glUseProgram(shaderProgram);
   */
         renderer.setUniform(std::string("aspect"),renderer.getAspectRatio());
+        renderer.models[0]->material.setBuffer("audio",audio);
         renderer.render();
         //renderer.renderFullScreenQuad();
         /*

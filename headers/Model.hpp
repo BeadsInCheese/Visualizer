@@ -4,12 +4,14 @@
 #include <string>
 #include <iostream>
 #include "Errorhandling.hpp"
+#include "material.hpp"
 class Model{
 unsigned int VAO;
 unsigned int VBO;
 unsigned int EBO;
-unsigned int shaderProgram;
+
 public:
+    Material material;
     int indexCount=0;
     Model(unsigned int shadedr,std::vector<float>& vertices,std::vector<int> &indices);
     ~Model();
