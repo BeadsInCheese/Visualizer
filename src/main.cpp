@@ -12,6 +12,7 @@
 #include "SpectrumAnalyzer.hpp"
 #include <complex.h>
 #include <cmath>
+#include <chrono>
 void testSndFile(){
     const char* filename = "example.wav";
     SF_INFO sfinfo;
@@ -78,6 +79,8 @@ int main() {
     //audioEngine.loadFile();
         // Main loop
     std::vector<float> prev;
+    auto start = std::chrono::high_resolution_clock::now();
+
     while (!glfwWindowShouldClose(renderer.window)) {
 /*
         // Clear the screen
@@ -87,24 +90,36 @@ int main() {
         // Use the shader program and draw the triangle
         glUseProgram(shaderProgram);
   */
-         audio = audioEngine.getCurrentSamples();
-         if (prev.size() == 0) {
+        auto now = std::chrono::high_resolution_clock::now();
+        if (std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() < 1000/60) {
+            continue;
+        }
+
+        start = now;
+        audio = audioEngine.getCurrentSamples();
+        std::vector<std::complex<float>> h(16384);
+        
+        audio.resize(16384);
+        
+             if (prev.size() == 0) {
+                 prev=std::vector<float>(16384, 0.0f);
+             }
+             int ind = 0;
+             for (auto j : audio) {
+                 h[ind]=std::complex<float>(j);
+                 ind++;
+             }
+             FFT(h);
+             for (int v = 0;v < h.size();v++) {
+                 audio[v] = lerp(log(abs(h[v].real())), prev[v], 0.9f);
+             }
              prev = audio;
-         }
-        std::vector < std::complex<float >> h;
-        for (auto j : audio) {
-            h.push_back(std::complex<float>(j));
-        }
-        auto x = FFT(h);
-        for(int v =0;v<x.size();v++){
-            audio[v] = lerp(x[v].real(),prev[v],0.99f);
-        }
-        prev = audio;
-        std::cout << audio.size();
-        std::string tempAspecStr=std::string("aspect");
-        renderer.setUniform(tempAspecStr,renderer.getAspectRatio());
-        renderer.models[0]->material.setBuffer("audio",audio);
-        renderer.render();
+             std::string tempAspecStr = std::string("aspect");
+             renderer.setUniform(tempAspecStr, renderer.getAspectRatio());
+             renderer.models[0]->material.setBuffer("audio", audio);
+             renderer.render();
+
+         
         //renderer.renderFullScreenQuad();
         /*
         glBindVertexArray(VAO);

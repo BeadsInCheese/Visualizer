@@ -1,26 +1,40 @@
 #include "SpectrumAnalyzer.hpp"
 
+const float pi = 3.14f;
 
-const  float pi=3.14;
- std::vector<std::complex<float>> FFT(std::vector<std::complex<float>> &samples){
-    int N=samples.size();
-    if(N=1){return samples;}
-    int M=N/2;
-    std::vector<std::complex<float>> Xeven(M,0);
-    std::vector<std::complex<float>> Xodd(M,0);
-    for(int i=0; i<M; i++){
-        Xeven[i]=samples[2*i];
-        Xodd[i]=samples[2*i+1];
+void FFT( std::vector<std::complex<float>>& samples) {
+
+    int n = samples.size();
+
+    // Bit reversal permutation: rearrange the input array.
+    for (int i = 1, j = 0; i < n; i++) {
+        int bit = n >> 1; // The highest bit
+        while (j >= bit) {
+            j -= bit;
+            bit >>= 1;
+        }
+        j += bit;
+        if (i < j) {
+            std::swap(samples[i], samples[j]);
+        }
     }
-    std::vector<std::complex<float>> FFTeven(M,0);
-    FFTeven=FFT(Xeven);
-    std::vector<std::complex<float>> FFTodd(M,0);
-    FFTodd=FFT(Xodd);
-    std::vector<std::complex<float>> freqBins(N,0);
-    for(int k=0; k<N/2;k++){
-        std::complex<float> exponential=std::polar(1.0f,-2.0f*pi*k/N)*FFTodd[k];
-        freqBins[k]=FFTeven[k]+exponential;
-        freqBins[k+N/2]=FFTeven[k]-exponential;
+
+    // Main FFT loop
+    for (int len = 2; len <= n; len <<= 1) {
+        // Compute the "twiddle factor" for this segment length
+        float angle = -2.0f * pi / len;
+        std::complex<float> wLen(cos(angle), sin(angle));
+
+        // Process each segment of length 'len'
+        for (int i = 0; i < n; i += len) {
+            std::complex<float> w(1.0f, 0.0f);
+            for (int j = 0; j < len / 2; j++) {
+                std::complex<float> u = samples[i + j];
+                std::complex<float> v = samples[i + j + len / 2] * w;
+                samples[i + j] = u + v;
+                samples[i + j + len / 2] = u - v;
+                w *= wLen;
+            }
+        }
     }
-    return freqBins;
 }
