@@ -2,7 +2,7 @@
 
 
 const  float pi=3.14;
-static std::vector<std::complex<float>> FFT(std::vector<std::complex<float>> &samples){
+ std::vector<std::complex<float>> FFT(std::vector<std::complex<float>> &samples){
     int N=samples.size();
     if(N=1){return samples;}
     int M=N/2;

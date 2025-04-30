@@ -27,18 +27,24 @@ target_include_directories(Vizualizer PUBLIC "libraries/glfw/include")
 
 target_include_directories(Vizualizer PUBLIC "headers")
 
+#add_subdirectory("libraries/openal")
+target_include_directories(Vizualizer PUBLIC "libraries/openal/include")
 # Add the GLAD library
 add_subdirectory("libraries/glad")
 
 include_directories("libraries/libsndfile/include")
 #target_link_libraries(Vizualizer "libraries/libsndfile/lib/sndfile.lib")
 find_library(SNDFILE_LIBRARY SndFile PATHS "libraries/libsndfile/lib/")
+find_library(openal_LIBRARY OpenAL32 PATHS "libraries/openal/libs/")
+
 # Include GLAD headers
 target_include_directories(Vizualizer PUBLIC "libraries/glad/include")
 
+
+
 # Link GLFW, GLAD, and OpenGL libraries
 if (WIN32)
-    target_link_libraries(Vizualizer PRIVATE glfw glad opengl32 ${SNDFILE_LIBRARY})
+    target_link_libraries(Vizualizer PRIVATE glfw glad opengl32 ${openal_LIBRARY} ${SNDFILE_LIBRARY})
 endif()
 
 if (UNIX)

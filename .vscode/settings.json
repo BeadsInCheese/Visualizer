@@ -61,5 +61,11 @@
         "xmemory": "cpp",
         "xstring": "cpp",
         "xtr1common": "cpp"
+    },
+    "files.exclude": {
+        "**/*.rpyc": true,
+        "**/*.rpa": true,
+        "**/*.rpymc": true,
+        "**/cache/": true
     }
 }

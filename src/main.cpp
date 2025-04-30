@@ -9,6 +9,9 @@
 #include "sndfile.h"
 #include "renderEngine.hpp"
 #include "audioEngine.hpp"
+#include "SpectrumAnalyzer.hpp"
+#include <complex.h>
+#include <cmath>
 void testSndFile(){
     const char* filename = "example.wav";
     SF_INFO sfinfo;
@@ -32,6 +35,9 @@ void testSndFile(){
     // Clean up
     delete[] buffer;
     sf_close(file);
+}
+float lerp(float a, float b, float t) {
+    return a + (b - a) * t;
 }
 int main() {
 {
@@ -69,8 +75,9 @@ int main() {
     renderer.addModel(m);
     std::vector<float> audio{0.9,0.8,0.8,0.7,0.6,0.5,0.4,0.8,0.8,0.7,0.6,0.5,0.4,0.8,0.8,0.7,0.6,0.5,0.4,0.9};
     AudioEngine audioEngine;
-    audioEngine.loadFile();
+    //audioEngine.loadFile();
         // Main loop
+    std::vector<float> prev;
     while (!glfwWindowShouldClose(renderer.window)) {
 /*
         // Clear the screen
@@ -80,7 +87,22 @@ int main() {
         // Use the shader program and draw the triangle
         glUseProgram(shaderProgram);
   */
-        renderer.setUniform(std::string("aspect"),renderer.getAspectRatio());
+         audio = audioEngine.getCurrentSamples();
+         if (prev.size() == 0) {
+             prev = audio;
+         }
+        std::vector < std::complex<float >> h;
+        for (auto j : audio) {
+            h.push_back(std::complex<float>(j));
+        }
+        auto x = FFT(h);
+        for(int v =0;v<x.size();v++){
+            audio[v] = lerp(x[v].real(),prev[v],0.99f);
+        }
+        prev = audio;
+        std::cout << audio.size();
+        std::string tempAspecStr=std::string("aspect");
+        renderer.setUniform(tempAspecStr,renderer.getAspectRatio());
         renderer.models[0]->material.setBuffer("audio",audio);
         renderer.render();
         //renderer.renderFullScreenQuad();
